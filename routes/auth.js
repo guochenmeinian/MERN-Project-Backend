@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../models/User");
 const CryptoJS = require("crypto-js");
 const { json } = require("express/lib/response");
+const jwt = require("jsonwebtoken");
 
 
 // REGISTER
@@ -11,6 +12,8 @@ router.post("/register", async (req, res) => {
         email : req.body.email,
         password : CryptoJS.AES.encrypt(req.body.password, process.env.PASS_SEC).toString(), 
     });
+
+    console.log(newUser);
 
     try {
         const savedUser = await newUser.save();
@@ -28,17 +31,28 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
     try{
         const user = await User.findOne({ username: req.body.username });
-        !user && res.status(401).json("Wrong Credentials!");
+        !user && res.status(401).json("User doesn't exist");
+        
         const hashedPassword = CryptoJS.AES.decrypt(
             user.password, 
             process.env.PASS_SEC
-        )
-        const password = hashedPassword.toString(CryptoJS.enc.Utf16);
+        );      
+        const originalPassword = hashedPassword.toString(CryptoJS.enc.Utf8);
         
-        password != req.body.password &&
-            res.status(401).json("Wrong Credentials");
+        originalPassword !== req.body.password &&
+            res.status(401).json("Wrong password");
 
-        res.status(200).json(user);
+            const accessToken = jwt.sign({
+                id: user._id,
+                isAdmin: user.isAdmin
+            }, process.env.JWT_SEC,
+            {expiresIn: "3d"} // expires in 3 days
+        )
+
+            // here others stand for everything other than password
+            const { password, ...others } = user._doc;
+            
+        res.status(200).json({...others, accessToken});
         
     }catch(err){
         res.status(500).json(err);
