@@ -8,7 +8,7 @@ const verifyToken = (req, res, next)=> {
             if (err) {
                 res.status(403).json("Invalid token");
             }
-            req.user = user;
+            req.user = user; // this user corresponds to the input authToken after verification process
             next(); // continue to user router
         });
     } else {
@@ -18,6 +18,7 @@ const verifyToken = (req, res, next)=> {
 
 const verifyTokenAndAuthorization = (req,res,next)=>{
     verifyToken(req,res,()=>{
+        // console.log(req.user.id + " " + req.params.id); // for testing purpose
         if(req.user.id === req.params.id || req.user.isAdmin){
             next();
         }else{
@@ -26,4 +27,14 @@ const verifyTokenAndAuthorization = (req,res,next)=>{
     })
 }
 
-module.exports = {verifyToken, verifyTokenAndAuthorization};
+const verifyTokenAndAdmin = (req,res,next)=>{
+    verifyToken(req,res,()=>{
+        if(req.user.isAdmin){
+            next();
+        }else{
+            res.status(403).json("No admin permission");
+        }
+    })
+}
+
+module.exports = {verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin};

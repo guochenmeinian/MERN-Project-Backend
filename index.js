@@ -4,6 +4,11 @@ const dotenv = require("dotenv");
 const app = express();
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
+const productRoute = require("./routes/product");
+const cartRoute = require("./routes/cart");
+const orderRoute = require("./routes/order");
+const stripeRoute = require("./routes/stripe");
+const cors = require('cors');
 
 dotenv.config();
 
@@ -15,8 +20,13 @@ dotenv.config();
  * link: https://stackoverflow.com/questions/23259168/what-are-express-json-and-express-urlencoded
  */
 app.use(express.json());
+app.use(cors()); // install so that it's not blocked by CORS policies
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/products", productRoute);
+app.use("/api/cart", cartRoute);
+app.use("/api/orders", orderRoute);
+app.use("/api/checkout", stripeRoute);
 
 mongoose
     .connect(
@@ -28,8 +38,6 @@ mongoose
     }
 );
 
-app.use(express.json());
-
-app.listen(process.env.PORT || 3000, () => {
-    console.log("backend server runs on port 3000");
+app.listen(process.env.PORT || 5000, () => {
+    console.log("backend server runs on port 5000");
 })

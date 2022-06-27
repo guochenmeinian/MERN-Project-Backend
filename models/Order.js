@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
     {
-        userId: {type: String, required: true, unique: true},
+        /**
+         * this userId can't have unique property, otherwise we can only have one order for each user
+         * spent half an hour found out this...
+         */
+        userId: {type: String, required: true}, 
         products: [
             {
                 productId: {
