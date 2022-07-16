@@ -1,5 +1,5 @@
 # E-Commerce Web App Backend
-#### The purpose of this project is to practice MERN Stack (backend).
+#### The purpose of this project is to practice MERN Stack (backend). Frontend part is in another Github Repo.
 
 #### This Full Stack Project is split into frontend and backend
 
